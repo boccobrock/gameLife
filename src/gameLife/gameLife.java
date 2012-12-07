@@ -11,18 +11,19 @@ import javax.swing.event.ChangeListener;
 /**
  * Simulator of Conway's Game of Life in a scalable resizable window.
  * Allows for user input to change which cells are alive and active.
- * 
+ *
  * @author Jeffrey Brock
  * @version 0.2, 7/8/2011
- * 
+ *
  * .3 graphics updates, error handling on mouse events, slider to choose play speed.
  */
 
+@SuppressWarnings("serial")
 public class gameLife extends JFrame implements MouseListener, ActionListener, MouseMotionListener, ChangeListener
 {
 	//size is the number of cells in the x and y direction, scale is the size of each cell in pixels
 	int size = 40, scale = 15, speed = 100;
-	
+
 	//grid to record cells that are alive
 	boolean grid[][] = new boolean[size][size];
 	boolean running = false, changeTrue = true;
@@ -30,12 +31,12 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 	JSlider slider;
 	JLabel sliderLabel;
 	BufferedImage gridImage;
-	
+
 	public gameLife()
 	{
 		//create grid array empty
 		initializeGrid(grid);
-		
+
 		//create window
 		this.setResizable(false);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -45,52 +46,57 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 		getContentPane().setLayout(null);
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
+
 		//add play button
 		play = new JButton("Play");
 		play.setBounds(10,5,60,25);
 		getContentPane().add(play);
 		play.addActionListener(this);
-		
+		play.setFont(Font.decode("10"));
+
 		//add stop button
 		stop = new JButton("Stop");
-		stop.setBounds(80,5,60,25);
+		stop.setBounds(80,5,70,25);
 		getContentPane().add(stop);
 		stop.addActionListener(this);
-		
+		stop.setFont(Font.decode("10"));
+
 		//add run step button
 		nextStep = new JButton("Next Step");
-		nextStep.setBounds(150,5,100,25);
+		nextStep.setBounds(160,5,100,25);
 		getContentPane().add(nextStep);
 		nextStep.addActionListener(this);
-		
+		nextStep.setFont(Font.decode("10"));
+
 		//add reset button
 		clear = new JButton("Clear Cells");
-		clear.setBounds(260,5,100,25);
+		clear.setBounds(270,5,100,25);
 		getContentPane().add(clear);
 		clear.addActionListener(this);
-		
+		clear.setFont(Font.decode("10"));
+
 		sliderLabel = new JLabel("Play Speed:");
-		sliderLabel.setBounds(370,5,70,25);
+		sliderLabel.setBounds(380,5,80,25);
 		getContentPane().add(sliderLabel);
-		
+		sliderLabel.setFont(Font.decode("10"));
+
 		// add slider to determine play speed
 		slider = new JSlider(JSlider.HORIZONTAL,20,500, speed);
-		slider.setBounds(440, 5, 150, 35);
+		slider.setBounds(460, 5, 150, 35);
 		slider.setMinorTickSpacing(60);
 		slider.setPaintTicks(true);
 		getContentPane().add(slider);
 		slider.addChangeListener(this);
-		
+
 		setVisible(true);
 	}
-	
+
 	public void paint(Graphics g)
 	{
 		//create grid and check for any filled in cells
 		super.paint(g);
 		Graphics2D gridGraph = (Graphics2D) g;
-		
+
 		//If not yet created, creates an image of the graph (to avoid remaking gridlines every paint call)
 		if(gridImage == null)
 		{
@@ -105,11 +111,11 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 					gridGraph.drawRect((i*scale), (j*scale), scale, scale);
 				}
 			}
-			
+
 		}
-		
+
 		g.drawImage(gridImage, 9, 59, null);
-		
+
 		//Fills in cells that are alive, checking with the grid[]
 		g.setColor(Color.black);
 		for(int i = 0; i < size; i++)
@@ -123,18 +129,18 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 					g.clearRect((i*scale)+11, (j*scale)+61, scale-3, scale-3);
 			}
 		}
-		
+
 		//run next iteration if playing continuously
 		if(running)
 			updateGrid();
 	}
-	
+
 	//overrides default update, so that the screen is not cleared with each repaint
 	public void update(Graphics g)
 	{
 		paint(g);
 	}
-	
+
 	public void mousePressed(MouseEvent evet)
 	{
 		// Uses mousePressed instead of mouseClicked to be quicker and more responsive
@@ -164,7 +170,7 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 			grid[((evet.getX()-10)/scale)][((evet.getY()-60)/scale)] = false;
 		repaint();
 	}
-	
+
 	public void actionPerformed(ActionEvent evet)
 	{
 		// Add functionality to the clear and nextStep buttons, allowing the cells to reproduce
@@ -188,13 +194,13 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 			running = false;
 		}
 	}
-	
+
 	public void stateChanged(ChangeEvent evet) {
 		// catch slider changes to change speed
 		JSlider catcher = (JSlider) evet.getSource();
 		speed = catcher.getValue();
 	}
-	
+
 	public void updateGrid()
 	{
 		try {
@@ -205,7 +211,7 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 		grid = calculateNext(grid);
 		repaint();
 	}
-	
+
 	public boolean[][] initializeGrid(boolean[][] grid)
 	{
 		//simply run through array setting all to false, signifying all empty cells
@@ -218,13 +224,13 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 		}
 		return grid;
 	}
-	
+
 	public boolean[][] calculateNext(boolean[][] grid)
 	{
 		//calculates the next step, using 4 rules to determine if a cell is living or not. then return new grid to be displayed.
 		//make newGrid, a copy of grid, to be manipulated and save the changes.
 		boolean newGrid[][] = new boolean[size][size];
-		
+
 		//calculate living neighbors of each cell
 		int neighbors = 0;
 		for(int i = 0; i < grid.length; i++)
@@ -248,7 +254,7 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 					neighbors++;
 				if(!(i+1>(size-1)) && !(j+1>(size-1)) && grid[i+1][j+1] == true)
 					neighbors++;
-				
+
 				//System.out.println(neighbors);
 				//first rule, any living cell with less than 2 neighbors dies
 				if(grid[i][j] == true && neighbors < 2)
@@ -262,20 +268,20 @@ public class gameLife extends JFrame implements MouseListener, ActionListener, M
 				//fourth rule, any dead cell with 3 neighbors becomes alive
 				if(grid[i][j] == false && neighbors == 3)
 					newGrid[i][j] = true;
-				
+
 				neighbors=0;
 			}
 		}
-		
+
 		return newGrid;
 	}
-	
+
 	public static void main(String args[])
 	{
 		//open window with grid
 		new gameLife();
 	}
-	
+
 	//necessary implemented classes
 	public void mouseEntered(MouseEvent arg0) {}
 	public void mouseExited(MouseEvent arg0) {}
